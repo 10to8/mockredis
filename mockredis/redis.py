@@ -262,7 +262,18 @@ class MockRedis(object):
         """Emulate hget."""
 
         redis_hash = self._get_hash(hashkey, 'HGET')
-        return redis_hash.get(str(attribute))
+        return self.result(redis_hash.get(str(attribute)))
+
+    def result(self, result):
+        from pipeline import MockRedisPipeline
+        if isinstance(self, MockRedisPipeline):
+            self.results.append(result)
+            print "pipeline results now: ", self.results
+            return result
+        if self.pipe:
+            print "pipeline results now: ", self.pipe.results
+            self.pipe.results.append(result)
+        return result
 
     def hgetall(self, hashkey):
         """Emulate hgetall."""
@@ -302,7 +313,7 @@ class MockRedis(object):
 
         redis_hash = self._get_hash(hashkey, 'HMGET')
         attributes = self._list_or_args(keys, args)
-        return [redis_hash.get(str(attribute)) for attribute in attributes]
+        return self.result([redis_hash.get(str(attribute)) for attribute in attributes])
 
     def hset(self, hashkey, attribute, value):
         """Emulate hset."""
