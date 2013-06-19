@@ -268,10 +268,8 @@ class MockRedis(object):
         from pipeline import MockRedisPipeline
         if isinstance(self, MockRedisPipeline):
             self.results.append(result)
-            print "pipeline results now: ", self.results
             return result
         if self.pipe:
-            print "pipeline results now: ", self.pipe.results
             self.pipe.results.append(result)
         return result
 
